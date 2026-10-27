@@ -1,14 +1,18 @@
 package cl.duoc.agronutri.viewmodels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.net.Uri
+import androidx.core.content.FileProvider
+import androidx.lifecycle.AndroidViewModel
 import cl.duoc.agronutri.model.CalculoNutricionalErrores
 import cl.duoc.agronutri.model.CalculoNutricionalUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.io.File
 
-class CalculoNutricionalViewModel : ViewModel() {
+class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(application) {
     private val _estado = MutableStateFlow(CalculoNutricionalUiState())
     val estado: StateFlow<CalculoNutricionalUiState> = _estado.asStateFlow()
 
@@ -61,5 +65,27 @@ class CalculoNutricionalViewModel : ViewModel() {
         )
         _estado.update { it.copy(errores = errores) }
         return errores == CalculoNutricionalErrores()
+    }
+
+    // Crea un JPEG vacío en files/fotos y entrega la dirección donde la cámara escribe.
+    // La autoridad debe coincidir con la del AndroidManifest.
+    fun crearFoto(): Uri {
+        val aplicacion = getApplication<Application>()
+        val directorio = File(aplicacion.filesDir, "fotos")
+        if (!directorio.exists()) {
+            directorio.mkdirs()
+        }
+        val archivo = File(directorio, "foliar-${System.currentTimeMillis()}.jpg")
+        archivo.createNewFile()
+        return FileProvider.getUriForFile(
+            aplicacion,
+            "cl.duoc.agronutri.fileprovider",
+            archivo
+        )
+    }
+
+    // Solo se llama si la cámara confirma que guardó la foto.
+    fun onFotoTomada(uri: String) {
+        _estado.update { it.copy(fotoUri = uri) }
     }
 }
