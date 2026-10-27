@@ -4,12 +4,17 @@ import android.app.Application
 import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import cl.duoc.agronutri.domain.CalculoNutricional
+import cl.duoc.agronutri.domain.DatosEjemplo
 import cl.duoc.agronutri.model.CalculoNutricionalErrores
 import cl.duoc.agronutri.model.CalculoNutricionalUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.io.File
 
 class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(application) {
@@ -18,32 +23,32 @@ class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(a
 
     fun onCultivoChange(valor: String) {
         _estado.update {
-            it.copy(cultivo = valor, errores = it.errores.copy(cultivo = null))
+            it.copy(cultivo = valor, resultado = null, errores = it.errores.copy(cultivo = null))
         }
     }
 
     fun onLoteChange(valor: String) {
         _estado.update {
-            it.copy(lote = valor, errores = it.errores.copy(lote = null))
+            it.copy(lote = valor, resultado = null, errores = it.errores.copy(lote = null))
         }
     }
 
     fun onMetaRendimientoChange(valor: String) {
         _estado.update {
-            it.copy(metaRendimiento = valor, errores = it.errores.copy(metaRendimiento = null))
+            it.copy(metaRendimiento = valor, resultado = null, errores = it.errores.copy(metaRendimiento = null))
         }
     }
 
     fun onEficienciaRiegoChange(valor: String) {
         _estado.update {
-            it.copy(eficienciaRiego = valor, errores = it.errores.copy(eficienciaRiego = null))
+            it.copy(eficienciaRiego = valor, resultado = null, errores = it.errores.copy(eficienciaRiego = null))
         }
     }
 
     // TODO confirmar con el cliente: rangos validos de rendimiento y eficiencia
     fun validar(): Boolean {
         val actual = _estado.value
-        // En Chile se escribe "6,4": se cambia la coma por punto antes de convertir
+        
         val meta = actual.metaRendimiento.replace(',', '.').toDoubleOrNull()
         val eficiencia = actual.eficienciaRiego.replace(',', '.').toDoubleOrNull()
 
@@ -67,8 +72,21 @@ class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(a
         return errores == CalculoNutricionalErrores()
     }
 
-    // Crea un JPEG vacío en files/fotos y entrega la dirección donde la cámara escribe.
-    // La autoridad debe coincidir con la del AndroidManifest.
+    fun calcular() {
+        if (_estado.value.calculando || !validar()) return
+        val actual = _estado.value
+        val cultivo = DatosEjemplo.buscar(actual.cultivo) ?: return
+        val meta = actual.metaRendimiento.replace(',', '.').toDouble()
+        val eficiencia = actual.eficienciaRiego.replace(',', '.').toDouble()
+
+        _estado.update { it.copy(calculando = true, resultado = null) }
+        viewModelScope.launch {
+            delay(800)
+            val resultado = CalculoNutricional.calcular(cultivo, meta, eficiencia)
+            _estado.update { it.copy(calculando = false, resultado = resultado) }
+        }
+    }
+
     fun crearFoto(): Uri {
         val aplicacion = getApplication<Application>()
         val directorio = File(aplicacion.filesDir, "fotos")

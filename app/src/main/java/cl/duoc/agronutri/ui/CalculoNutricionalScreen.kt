@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +22,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -31,12 +37,15 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -45,7 +54,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cl.duoc.agronutri.domain.DatosEjemplo
+import cl.duoc.agronutri.domain.Nutrientes
 import cl.duoc.agronutri.viewmodels.CalculoNutricionalViewModel
+import java.util.Locale
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,13 +128,31 @@ fun CalculoNutricionalScreen(
     }
 
     // TODO confirmar con el cliente: lista de cultivos (viene del catalogo)
-    val cultivos = listOf("Palto", "Cítricos", "Tomate")
+    val cultivos = DatosEjemplo.cultivos.map { it.nombre }
+
+    // Al aparecer el resultado, la pantalla baja sola hasta la tarjeta.
+    val scrollState = rememberScrollState()
+    LaunchedEffect(estado.resultado) {
+        if (estado.resultado != null) {
+            delay(300) // espera a que la tarjeta termine de aparecer
+            scrollState.animateScrollTo(scrollState.maxValue)
+        }
+    }
+
+    val colorBoton by animateColorAsState(
+        targetValue = when {
+            estado.calculando -> Color.Gray
+            estado.resultado != null -> Color(0xFF2E7D32)
+            else -> MaterialTheme.colorScheme.primary
+        },
+        label = "colorBoton"
+    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -209,23 +240,66 @@ fun CalculoNutricionalScreen(
         Button(
             onClick = {
                 if (viewModel.validar()) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Datos válidos")
-                    }
+                    viewModel.calcular()
                 } else {
                     scope.launch {
                         snackbarHostState.showSnackbar("Errores detectados. Revisa los campos.")
                     }
                 }
             },
+            enabled = !estado.calculando,
+            colors = ButtonDefaults.buttonColors(containerColor = colorBoton),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Calcular")
+            if (estado.calculando) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(if (estado.resultado != null) "Recalcular" else "Calcular")
+            }
+        }
+
+        AnimatedVisibility(visible = estado.resultado != null) {
+            estado.resultado?.let { TarjetaResultado(it) }
         }
 
         SnackbarHost(hostState = snackbarHostState)
     }
 }
+
+@Composable
+private fun TarjetaResultado(resultado: Nutrientes) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text("Demanda estimada (kg/há)", style = MaterialTheme.typography.titleMedium)
+            resultado.comoLista().forEach { (nombre, valor) ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(nombre, modifier = Modifier.weight(1f))
+                    Text(formatoKg(valor), fontWeight = FontWeight.Bold)
+                }
+            }
+            Text(
+                "Estimación referencial, datos de ejemplo. No usar como recomendación.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+// Formato chileno: coma decimal, un decimal.
+private fun formatoKg(valor: Double): String =
+    String.format(Locale.forLanguageTag("es-CL"), "%.1f", valor)
 
 // La cámara entrega una imagen grande: inSampleSize = 4 la reduce para mostrarla.
 private fun cargarFoto(contexto: Context, uri: String): ImageBitmap? {
