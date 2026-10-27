@@ -8,7 +8,6 @@ import org.junit.Test
 
 class CalculoNutricionalTest {
 
-    // Cultivo inventado para la prueba: rendimiento base 10 t/há.
     private val cultivo = CultivoReferencia(
         nombre = "Prueba",
         rendimientoBase = 10.0,

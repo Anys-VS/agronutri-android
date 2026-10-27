@@ -48,7 +48,7 @@ class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(a
     // TODO confirmar con el cliente: rangos validos de rendimiento y eficiencia
     fun validar(): Boolean {
         val actual = _estado.value
-        // En Chile se escribe "6,4": se cambia la coma por punto antes de convertir
+        
         val meta = actual.metaRendimiento.replace(',', '.').toDoubleOrNull()
         val eficiencia = actual.eficienciaRiego.replace(',', '.').toDoubleOrNull()
 
@@ -81,15 +81,12 @@ class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(a
 
         _estado.update { it.copy(calculando = true, resultado = null) }
         viewModelScope.launch {
-            // Como en la guía: la espera deja ver el loader, el cálculo es instantáneo.
             delay(800)
             val resultado = CalculoNutricional.calcular(cultivo, meta, eficiencia)
             _estado.update { it.copy(calculando = false, resultado = resultado) }
         }
     }
 
-    // Crea un JPEG vacío en files/fotos y entrega la dirección donde la cámara escribe.
-    // La autoridad debe coincidir con la del AndroidManifest.
     fun crearFoto(): Uri {
         val aplicacion = getApplication<Application>()
         val directorio = File(aplicacion.filesDir, "fotos")
