@@ -5,6 +5,8 @@ data class CalculoNutricionalUiState(
     val lote: String = "",
     val metaRendimiento: String = "",
     val eficienciaRiego: String = "",
+    // Dirección content:// de la foto foliar. Vacía = sin foto (es opcional).
+    val fotoUri: String = "",
     val errores: CalculoNutricionalErrores = CalculoNutricionalErrores()
 )
 
