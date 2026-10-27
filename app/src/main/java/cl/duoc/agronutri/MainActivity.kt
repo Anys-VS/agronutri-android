@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import cl.duoc.agronutri.model.HomeUiState
 import cl.duoc.agronutri.navigation.NavigationEvent
 import cl.duoc.agronutri.navigation.Screen
 import cl.duoc.agronutri.ui.CalculoNutricionalScreen
@@ -42,7 +43,13 @@ class MainActivity : ComponentActivity() {
                     startDestination = Screen.Home.route
                 ) {
                     composable(Screen.Home.route) {
-                        HomeScreen(viewModel = viewModel)
+                        // TODO al unir con dfm: nombre y rol desde authViewModel.sesion,
+                        // onCerrarSesion con navigateAndClear(Screen.Login).
+                        // TODO bloque 2: pendientes y últimos registros desde Room.
+                        HomeScreen(
+                            state = HomeUiState(nombre = "Usuario Demo", rol = "AGRICULTOR"),
+                            onNuevoRegistro = { viewModel.navigateTo(Screen.CalculoNutricional) }
+                        )
                     }
                     composable(Screen.CalculoNutricional.route) {
                         CalculoNutricionalScreen()
