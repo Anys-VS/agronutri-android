@@ -77,14 +77,14 @@ fun LoginScreen(
                     .padding(24.dp)
             ) {
                 Text(
-                    "Iniciar sesión",
+                    "Iniciar Sesión",
                     color = ColoresMarca.Titulo,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Ingresa con tu correo y contraseña",
+                    "Ingresa con tu Correo y Contraseña.",
                     color = ColoresMarca.Subtitulo,
                     fontSize = 15.sp
                 )
@@ -93,7 +93,7 @@ fun LoginScreen(
                 CampoTexto(
                     valor = state.correo,
                     onCambio = authViewModel::onLoginCorreoChange,
-                    etiqueta = "Correo electrónico",
+                    etiqueta = "Correo Electrónico",
                     error = state.errorCorreo,
                     tipoTeclado = KeyboardType.Email,
                     habilitado = !state.cargando
@@ -112,7 +112,7 @@ fun LoginScreen(
                 Spacer(Modifier.height(24.dp))
 
                 BotonPrincipal(
-                    texto = "Iniciar sesión",
+                    texto = "Iniciar Sesión",
                     onClick = { authViewModel.iniciarSesion(onLoginExitoso) },
                     cargando = state.cargando
                 )
@@ -123,7 +123,7 @@ fun LoginScreen(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(
-                        "¿No tienes cuenta? Regístrate",
+                        "¿No tienes cuenta? Regístrate.",
                         color = ColoresMarca.Verde,
                         fontWeight = FontWeight.SemiBold
                     )

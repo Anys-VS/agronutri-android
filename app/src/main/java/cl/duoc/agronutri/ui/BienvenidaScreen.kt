@@ -82,7 +82,7 @@ fun BienvenidaScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Nutrición vegetal\nen terreno",
+                        "Nutrición Vegetal\nen Terreno",
                         color = ColoresMarca.Titulo,
                         fontSize = 28.sp,
                         lineHeight = 32.sp,
@@ -91,7 +91,7 @@ fun BienvenidaScreen(
                     )
                     Spacer(Modifier.height(10.dp))
                     Text(
-                        "Calcula, registra y consulta,\nincluso sin internet",
+                        "Calcula, Registra y Consulta,\nincluso sin Internet.",
                         color = ColoresMarca.Subtitulo,
                         fontSize = 17.sp,
                         lineHeight = 23.sp,
@@ -109,7 +109,7 @@ fun BienvenidaScreen(
             )
             Spacer(Modifier.height(32.dp))
 
-            BotonPrincipal("Iniciar sesión", onClick = onIniciarSesion)
+            BotonPrincipal("Iniciar Sesión", onClick = onIniciarSesion)
             Spacer(Modifier.height(12.dp))
             BotonSecundario("Registrarme", onClick = onRegistrarme)
             Spacer(Modifier.height(20.dp))
@@ -118,7 +118,7 @@ fun BienvenidaScreen(
         }
 
         Text(
-            "Todos los derechos reservados",
+            "Todos los Derechos Reservados.",
             color = ColoresMarca.Subtitulo,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
