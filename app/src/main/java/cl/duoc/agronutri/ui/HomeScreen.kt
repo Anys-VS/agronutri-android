@@ -30,8 +30,6 @@ import cl.duoc.agronutri.model.HomeUiState
 import cl.duoc.agronutri.model.RegistroResumen
 import cl.duoc.agronutri.ui.theme.AgroNutriTheme
 
-// Pantalla sin estado propio: recibe los datos y avisa las acciones.
-// Así no depende de cómo se guarda la sesión ni los registros.
 @Composable
 fun HomeScreen(
     state: HomeUiState,
@@ -51,9 +49,7 @@ fun HomeScreen(
             EncabezadoMarca()
 
             LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .navigationBarsPadding(),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
@@ -98,6 +94,17 @@ fun HomeScreen(
                 }
                 item { Spacer(Modifier.height(24.dp)) }
             }
+
+            // Estado de la red al pie de la pantalla. La app trabaja offline:
+            // todo se guarda en el teléfono y se sincroniza en una etapa futura.
+            ChipSinConexion(
+                texto = "${if (state.conectado) "Con conexión" else "Sin conexión"} · ${textoPendientes(state.pendientes)}",
+                conectado = state.conectado,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .navigationBarsPadding()
+                    .padding(top = 8.dp, bottom = 52.dp)
+            )
         }
     }
 }
@@ -123,12 +130,6 @@ private fun Saludo(state: HomeUiState, onCerrarSesion: (() -> Unit)?) {
             text = nombreRol(state.rol),
             color = ColoresMarca.Subtitulo,
             fontSize = 15.sp
-        )
-        Spacer(Modifier.height(12.dp))
-        // La app trabaja offline: todo se guarda en el teléfono y se sincroniza en una etapa futura.
-        ChipSinConexion(
-            texto = "${if (state.conectado) "Con conexión" else "Sin conexión"} · ${textoPendientes(state.pendientes)}",
-            conectado = state.conectado
         )
         Spacer(Modifier.height(8.dp))
     }
