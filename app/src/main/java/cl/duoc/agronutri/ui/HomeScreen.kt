@@ -95,8 +95,6 @@ fun HomeScreen(
                 item { Spacer(Modifier.height(24.dp)) }
             }
 
-            // Estado de la red al pie de la pantalla. La app trabaja offline:
-            // todo se guarda en el teléfono y se sincroniza en una etapa futura.
             ChipSinConexion(
                 texto = "${if (state.conectado) "Con conexión" else "Sin conexión"} · ${textoPendientes(state.pendientes)}",
                 conectado = state.conectado,
