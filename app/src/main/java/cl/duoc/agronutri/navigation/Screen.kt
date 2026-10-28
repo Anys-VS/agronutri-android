@@ -1,6 +1,7 @@
 package cl.duoc.agronutri.navigation
 
 sealed class Screen(val route: String) {
+    data object Splash : Screen("splash_page")
     data object Bienvenida : Screen("bienvenida_page")
     data object Login : Screen("login_page")
     data object Registro : Screen("registro_page")

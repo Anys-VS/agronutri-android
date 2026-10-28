@@ -3,6 +3,7 @@ package cl.duoc.agronutri.ui
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -32,7 +32,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -44,13 +43,13 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cl.duoc.agronutri.R
@@ -66,9 +65,10 @@ object ColoresMarca {
     val Subtitulo = Color(0xFF424242)
     val ChipFondo = Color(0xFFF5F5F0)
     val ChipBorde = Color(0xFF626960)
+    val TextoLogo = Color(0xFF153E45) // color del nombre en el SVG del logo
 }
 
-/** Franja verde superior con el logo y el nombre de la marca (res/values/marca.xml). */
+/** Franja verde superior con el nombre de la marca (res/values/marca.xml). */
 @Composable
 fun EncabezadoMarca(modifier: Modifier = Modifier, onVolver: (() -> Unit)? = null) {
     Box(
@@ -83,48 +83,24 @@ fun EncabezadoMarca(modifier: Modifier = Modifier, onVolver: (() -> Unit)? = nul
                 Text("← Volver", color = Color.White)
             }
         }
-        Row(
-            modifier = Modifier.align(Alignment.Center),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                HojaIcono(Modifier.size(24.dp), trazo = ColoresMarca.Verde)
-            }
-            Spacer(Modifier.width(10.dp))
-            Text(
-                text = stringResource(R.string.nombre_marca),
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        Text(
+            text = stringResource(R.string.nombre_marca),
+            color = Color.White,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
-/** Hoja dibujada con código (no necesita archivos de imagen). */
+/** Logo de NutriExpert (res/drawable/logo.xml), como LogoApp de la guía de pantalla de inicio. */
 @Composable
-fun HojaIcono(
-    modifier: Modifier = Modifier,
-    trazo: Color,
-    relleno: Color = Color.Transparent,
-    grosor: Dp = 2.dp,
-    rotacion: Float = 40f
-) {
-    Canvas(modifier) {
-        val w = size.width * 0.55f
-        val h = size.height * 0.85f
-        rotate(rotacion) {
-            translate((size.width - w) / 2f, (size.height - h) / 2f) {
-                dibujarHoja(w, h, trazo, relleno, grosor.toPx())
-            }
-        }
-    }
+fun LogoApp(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(R.drawable.logo),
+        contentDescription = "Logo NutriExpert",
+        modifier = modifier
+    )
 }
 
 private fun DrawScope.dibujarHoja(w: Float, h: Float, trazo: Color, relleno: Color, g: Float) {
@@ -224,7 +200,7 @@ private fun IconoSinConexion(modifier: Modifier = Modifier, color: Color) {
 }
 
 @Composable
-fun ChipSinConexion(modifier: Modifier = Modifier) {
+fun ChipSinConexion(modifier: Modifier = Modifier, texto: String = "Funciona sin conexión") {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50),
@@ -238,7 +214,7 @@ fun ChipSinConexion(modifier: Modifier = Modifier) {
             IconoSinConexion(Modifier.size(18.dp), color = ColoresMarca.Titulo)
             Spacer(Modifier.width(8.dp))
             Text(
-                "Funciona sin conexión",
+                texto,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = ColoresMarca.Titulo

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -58,7 +59,15 @@ fun LoginScreen(
                 .padding(padding)
                 .imePadding()
         ) {
-            EncabezadoMarca(onVolver = onVolver)
+            // Sin barra verde: solo el botón para volver, sobre fondo blanco.
+            TextButton(
+                onClick = onVolver,
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(start = 8.dp, top = 8.dp)
+            ) {
+                Text("← Volver", color = ColoresMarca.Verde, fontWeight = FontWeight.SemiBold)
+            }
 
             Column(
                 modifier = Modifier
