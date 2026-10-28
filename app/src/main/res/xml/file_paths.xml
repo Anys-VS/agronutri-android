@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- files-path y no cache-path: la foto foliar queda unida al registro de terreno
+         y Android no debe borrarla al liberar espacio. -->
+    <files-path
+        name="fotos"
+        path="fotos/" />
+</paths>

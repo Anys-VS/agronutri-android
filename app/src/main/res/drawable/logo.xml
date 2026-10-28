@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Símbolo de NutriExpert convertido desde nutriexpert-logo.svg.
+     Android no lee .svg directo: se usa este vector. El texto "NutriExpert"
+     no va aquí (los vectores no soportan texto); se escribe con Text en Compose. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Fondo verde con esquinas redondeadas -->
+    <path android:pathData="M156,24H356A132,132 0,0 1,488 156V356A132,132 0,0 1,356 488H156A132,132 0,0 1,24 356V156A132,132 0,0 1,156 24Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="78"
+                android:startY="62"
+                android:endX="438"
+                android:endY="462"
+                android:startColor="#FF123F17"
+                android:endColor="#FF1B5E20" />
+        </aapt:attr>
+    </path>
+
+    <!-- Letra N -->
+    <path
+        android:pathData="M142,354V166L368,354V218"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="58"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Hoja -->
+    <path android:pathData="M350,215C358,155 406,123 458,137C449,193 410,221 350,215Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="366"
+                android:startY="145"
+                android:endX="438"
+                android:endY="216"
+                android:startColor="#FFF1F8E9"
+                android:endColor="#FFA5D6A7" />
+        </aapt:attr>
+    </path>
+
+    <!-- Nervio de la hoja -->
+    <path
+        android:pathData="M364,204C385,197 406,184 426,165"
+        android:strokeColor="#FF1B5E20"
+        android:strokeWidth="12"
+        android:strokeLineCap="round" />
+</vector>
