@@ -117,7 +117,7 @@ fun RegistroScreen(
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        Roles.AGRICULTOR to "Agricultor",
+                        Roles.AGRICULTOR to "Agricultor.",
                         Roles.ASESOR to "Asesor agrónomo"
                     ).forEach { (valor, etiqueta) ->
                         FilterChip(
@@ -203,7 +203,7 @@ fun RegistroScreen(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(
-                        "¿Ya tienes cuenta? Inicia sesión",
+                        "¿Ya tienes cuenta? Inicia Sesión",
                         color = ColoresMarca.Verde,
                         fontWeight = FontWeight.SemiBold
                     )

@@ -64,15 +64,15 @@ fun HomeScreen(
                         modifier = Modifier.padding(horizontal = 24.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        BotonPrincipal("Nuevo registro de terreno", onClick = onNuevoRegistro)
+                        BotonPrincipal("Nuevo Registro de Terreno", onClick = onNuevoRegistro)
                         if (onVerHistorial != null) {
-                            BotonSecundario("Ver historial", onClick = onVerHistorial)
+                            BotonSecundario("Ver Historial", onClick = onVerHistorial)
                         }
                     }
                 }
                 item {
                     Text(
-                        text = "Últimos registros",
+                        text = "Últimos Registros.",
                         color = ColoresMarca.Titulo,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -115,7 +115,7 @@ private fun Saludo(state: HomeUiState, onCerrarSesion: (() -> Unit)?) {
             )
             if (onCerrarSesion != null) {
                 TextButton(onClick = onCerrarSesion) {
-                    Text("Cerrar sesión", color = ColoresMarca.Verde, fontWeight = FontWeight.SemiBold)
+                    Text("Cerrar Sesión", color = ColoresMarca.Verde, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -161,15 +161,15 @@ private fun TarjetaRegistro(registro: RegistroResumen, modifier: Modifier = Modi
 }
 
 private fun nombreRol(rol: String): String = when (rol) {
-    "AGRICULTOR" -> "Agricultor"
+    "AGRICULTOR" -> "Agricultor."
     "ASESOR" -> "Asesor agrónomo"
     else -> rol
 }
 
 private fun textoPendientes(n: Int): String = when (n) {
-    0 -> "sin registros pendientes"
-    1 -> "1 registro pendiente"
-    else -> "$n registros pendientes"
+    0 -> "sin Registros Pendientes."
+    1 -> "1 Registro Pendiente."
+    else -> "$n Registros Pendientes."
 }
 
 @Preview(showBackground = true)

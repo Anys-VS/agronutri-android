@@ -179,14 +179,14 @@ fun CalculoNutricionalScreen(
             ) {
                 Column {
                     Text(
-                        "Registro de terreno",
+                        "Registro de Terreno",
                         color = ColoresMarca.Titulo,
                         fontSize = 26.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Datos del lote y cálculo nutricional",
+                        "Datos del lote y cálculo nutricional.",
                         color = ColoresMarca.Subtitulo,
                         fontSize = 15.sp
                     )
@@ -219,24 +219,24 @@ fun CalculoNutricionalScreen(
                 CampoTexto(
                     valor = estado.metaRendimiento,
                     onCambio = viewModel::onMetaRendimientoChange,
-                    etiqueta = "Meta de rendimiento (t/há)",
+                    etiqueta = "Meta de Rendimiento (t/há)",
                     error = estado.errores.metaRendimiento,
                     tipoTeclado = KeyboardType.Decimal
                 )
                 CampoTexto(
                     valor = estado.eficienciaRiego,
                     onCambio = viewModel::onEficienciaRiegoChange,
-                    etiqueta = "Eficiencia de riego (%)",
+                    etiqueta = "Eficiencia de Riego (%)",
                     error = estado.errores.eficienciaRiego,
                     tipoTeclado = KeyboardType.Decimal,
                     accionTeclado = ImeAction.Done
                 )
 
-                Text("Foto foliar (opcional)", color = ColoresMarca.Subtitulo, fontWeight = FontWeight.SemiBold)
+                Text("Foto Foliar (Opcional)", color = ColoresMarca.Subtitulo, fontWeight = FontWeight.SemiBold)
                 if (foto != null) {
                     Image(
                         bitmap = foto,
-                        contentDescription = "Foto foliar del lote",
+                        contentDescription = "Foto Foliar del lote",
                         modifier = Modifier
                             .size(160.dp)
                             .clip(RoundedCornerShape(12.dp)),
@@ -244,19 +244,19 @@ fun CalculoNutricionalScreen(
                     )
                 }
                 BotonSecundario(
-                    texto = if (estado.fotoUri.isBlank()) "Tomar foto foliar" else "Tomar otra foto",
+                    texto = if (estado.fotoUri.isBlank()) "Tomar Foto Foliar" else "Tomar otra foto",
                     onClick = { pedirFoto() }
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                Text("Vista previa en tiempo real", color = ColoresMarca.Titulo, fontWeight = FontWeight.Bold)
+                Text("Vista Previa en Tiempo Real", color = ColoresMarca.Titulo, fontWeight = FontWeight.Bold)
                 Column {
                     Text("Cultivo: ${estado.cultivo}", color = ColoresMarca.Subtitulo)
                     Text("Lote: ${estado.lote}", color = ColoresMarca.Subtitulo)
-                    Text("Meta de rendimiento: ${estado.metaRendimiento} t/há", color = ColoresMarca.Subtitulo)
-                    Text("Eficiencia de riego: ${estado.eficienciaRiego} %", color = ColoresMarca.Subtitulo)
+                    Text("Meta de Rendimiento: ${estado.metaRendimiento} t/há", color = ColoresMarca.Subtitulo)
+                    Text("Eficiencia de Riego: ${estado.eficienciaRiego} %", color = ColoresMarca.Subtitulo)
                     Text(
-                        "Foto foliar: ${if (estado.fotoUri.isBlank()) "sin foto" else "adjunta"}",
+                        "Foto Foliar: ${if (estado.fotoUri.isBlank()) "Sin Foto." else "Adjunta."}",
                         color = ColoresMarca.Subtitulo
                     )
                 }

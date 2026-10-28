@@ -79,7 +79,12 @@ fun EncabezadoMarca(modifier: Modifier = Modifier, onVolver: (() -> Unit)? = nul
     ) {
         if (onVolver != null) {
             TextButton(onClick = onVolver, modifier = Modifier.align(Alignment.CenterStart)) {
-                Text("← Volver", color = Color.White)
+                Text(
+                    "Volver",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
         Text(
