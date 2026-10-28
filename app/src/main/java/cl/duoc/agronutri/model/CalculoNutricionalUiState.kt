@@ -12,6 +12,7 @@ data class CalculoNutricionalUiState(
     // null = todavía no se calcula, o se cambió un dato después de calcular.
     val resultado: Nutrientes? = null,
     val calculando: Boolean = false,
+    val guardando: Boolean = false,
     val errores: CalculoNutricionalErrores = CalculoNutricionalErrores()
 )
 

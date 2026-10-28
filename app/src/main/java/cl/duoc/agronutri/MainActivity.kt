@@ -12,17 +12,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cl.duoc.agronutri.model.HomeUiState
+import cl.duoc.agronutri.model.RegistroResumen
 import cl.duoc.agronutri.navigation.NavigationEvent
 import cl.duoc.agronutri.navigation.Screen
 import cl.duoc.agronutri.ui.BienvenidaScreen
 import cl.duoc.agronutri.ui.CalculoNutricionalScreen
+import cl.duoc.agronutri.ui.HistorialScreen
 import cl.duoc.agronutri.ui.HomeScreen
+import cl.duoc.agronutri.ui.formatoFecha
 import cl.duoc.agronutri.ui.LoginScreen
 import cl.duoc.agronutri.ui.RegistroScreen
 import cl.duoc.agronutri.ui.SplashScreen
 import cl.duoc.agronutri.ui.theme.AgroNutriTheme
 import cl.duoc.agronutri.viewmodels.AuthViewModel
 import cl.duoc.agronutri.viewmodels.MainViewModel
+import cl.duoc.agronutri.viewmodels.RegistrosViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +37,13 @@ class MainActivity : ComponentActivity() {
             AgroNutriTheme {
                 val viewModel: MainViewModel = viewModel()
                 val authViewModel: AuthViewModel = viewModel()
+                val registrosViewModel: RegistrosViewModel = viewModel()
                 val navController = rememberNavController()
+
+                val sesion by authViewModel.sesion.collectAsState()
+                val todosLosRegistros by registrosViewModel.registros.collectAsState()
+                // Cada usuario ve solo sus registros.
+                val registros = todosLosRegistros.filter { it.usuarioId == sesion?.id }
 
                 LaunchedEffect(Unit) {
                     viewModel.navigationEvents.collectLatest { event ->
@@ -84,14 +94,23 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(Screen.Home.route) {
-                        val sesion by authViewModel.sesion.collectAsState()
-                        // TODO bloque 2: pendientes y últimos registros desde Room.
                         HomeScreen(
                             state = HomeUiState(
                                 nombre = sesion?.nombre.orEmpty(),
-                                rol = sesion?.rol.orEmpty()
+                                rol = sesion?.rol.orEmpty(),
+                                pendientes = registros.count { !it.sincronizado },
+                                ultimosRegistros = registros.take(3).map {
+                                    RegistroResumen(
+                                        id = it.id,
+                                        cultivo = it.cultivo,
+                                        lote = it.lote,
+                                        fecha = formatoFecha(it.creadoEn),
+                                        sincronizado = it.sincronizado
+                                    )
+                                }
                             ),
                             onNuevoRegistro = { viewModel.navigateTo(Screen.CalculoNutricional) },
+                            onVerHistorial = { viewModel.navigateTo(Screen.Historial) },
                             onCerrarSesion = {
                                 authViewModel.cerrarSesion()
                                 // A la bienvenida y no al login: desde ahí "atrás" cierra la app.
@@ -100,7 +119,19 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(Screen.CalculoNutricional.route) {
-                        CalculoNutricionalScreen(onVolver = { viewModel.popBackStack() })
+                        CalculoNutricionalScreen(
+                            usuarioId = sesion?.id ?: 0,
+                            // Al guardar vuelve al Home, que ya muestra el registro nuevo.
+                            onGuardado = { viewModel.popBackStack() },
+                            onVolver = { viewModel.popBackStack() }
+                        )
+                    }
+                    composable(Screen.Historial.route) {
+                        HistorialScreen(
+                            registros = registros,
+                            onBorrar = { id -> registrosViewModel.borrar(id) },
+                            onVolver = { viewModel.popBackStack() }
+                        )
                     }
                 }
             }

@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cl.duoc.agronutri.data.AppDatabase
+import cl.duoc.agronutri.data.RegistroTerreno
 import cl.duoc.agronutri.domain.CalculoNutricional
 import cl.duoc.agronutri.domain.DatosEjemplo
 import cl.duoc.agronutri.model.CalculoNutricionalErrores
@@ -20,6 +22,8 @@ import java.io.File
 class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(application) {
     private val _estado = MutableStateFlow(CalculoNutricionalUiState())
     val estado: StateFlow<CalculoNutricionalUiState> = _estado.asStateFlow()
+
+    private val dao = AppDatabase.obtener(application).registroTerrenoDao()
 
     fun onCultivoChange(valor: String) {
         _estado.update {
@@ -84,6 +88,34 @@ class CalculoNutricionalViewModel(application: Application) : AndroidViewModel(a
             delay(800)
             val resultado = CalculoNutricional.calcular(cultivo, meta, eficiencia)
             _estado.update { it.copy(calculando = false, resultado = resultado) }
+        }
+    }
+
+    // Guarda en Room el registro con su resultado. Solo se puede después de calcular.
+    fun guardar(usuarioId: Long, onGuardado: () -> Unit) {
+        val actual = _estado.value
+        val resultado = actual.resultado ?: return
+        if (actual.guardando) return
+        viewModelScope.launch {
+            _estado.update { it.copy(guardando = true) }
+            dao.insertar(
+                RegistroTerreno(
+                    usuarioId = usuarioId,
+                    cultivo = actual.cultivo,
+                    lote = actual.lote.trim(),
+                    metaRendimiento = actual.metaRendimiento.replace(',', '.').toDouble(),
+                    eficienciaRiego = actual.eficienciaRiego.replace(',', '.').toDouble(),
+                    n = resultado.n,
+                    p2o5 = resultado.p2o5,
+                    k2o = resultado.k2o,
+                    cao = resultado.cao,
+                    mgo = resultado.mgo,
+                    fotoUri = actual.fotoUri,
+                    creadoEn = System.currentTimeMillis()
+                )
+            )
+            _estado.update { it.copy(guardando = false) }
+            onGuardado()
         }
     }
 

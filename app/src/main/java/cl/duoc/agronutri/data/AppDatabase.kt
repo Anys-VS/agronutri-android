@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Usuario::class], version = 1, exportSchema = false)
+@Database(entities = [Usuario::class, RegistroTerreno::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun usuarioDao(): UsuarioDao
+    abstract fun registroTerrenoDao(): RegistroTerrenoDao
 
     companion object {
         @Volatile
@@ -19,7 +20,11 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "agronutri.db"
-                ).build().also { instancia = it }
+                )
+                    // Versión 2 agrega la tabla de registros. En el MVP solo hay datos ficticios,
+                    // así que al cambiar de versión se borra la base en vez de migrarla.
+                    .fallbackToDestructiveMigration(true)
+                    .build().also { instancia = it }
             }
         }
     }
