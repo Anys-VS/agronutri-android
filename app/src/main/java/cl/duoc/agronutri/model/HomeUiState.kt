@@ -1,7 +1,5 @@
 package cl.duoc.agronutri.model
 
-// Lo que muestra el Home. La pantalla no sabe de dónde vienen los datos:
-// el nombre y el rol salen de la sesión y los registros, de Room.
 data class HomeUiState(
     val nombre: String = "",
     val rol: String = "",

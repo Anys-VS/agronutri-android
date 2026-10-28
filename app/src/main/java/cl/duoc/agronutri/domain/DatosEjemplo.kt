@@ -1,8 +1,7 @@
 package cl.duoc.agronutri.domain
 
 // VALORES FICTICIOS, SOLO PARA LA DEMO.
-// No son recomendaciones agronómicas: las tablas reales las entrega el cliente
-// (Consultora Gestión y Proyectos) y reemplazan esta lista.
+
 object DatosEjemplo {
     val cultivos: List<CultivoReferencia> = listOf(
         CultivoReferencia(

@@ -1,6 +1,6 @@
 package cl.duoc.agronutri.domain
 
-// Demanda de nutrientes en kg/há.
+// Demanda de nutrientes
 data class Nutrientes(
     val n: Double,
     val p2o5: Double,
@@ -8,7 +8,7 @@ data class Nutrientes(
     val cao: Double,
     val mgo: Double
 ) {
-    // Pares nombre-valor para dibujar la tabla en el orden de NutriExpert.
+  
     fun comoLista(): List<Pair<String, Double>> = listOf(
         "N" to n,
         "P₂O₅" to p2o5,
@@ -18,7 +18,7 @@ data class Nutrientes(
     )
 }
 
-// Cultivo con su rendimiento base (t/há) y lo que extrae a ese rendimiento.
+// Cultivo con su rendimiento base 
 data class CultivoReferencia(
     val nombre: String,
     val rendimientoBase: Double,

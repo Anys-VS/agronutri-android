@@ -69,6 +69,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CalculoNutricionalScreen(
+    usuarioId: Long,
+    onGuardado: () -> Unit,
     viewModel: CalculoNutricionalViewModel = viewModel(),
     onVolver: (() -> Unit)? = null
 ) {
@@ -293,7 +295,14 @@ fun CalculoNutricionalScreen(
                 }
 
                 AnimatedVisibility(visible = estado.resultado != null) {
-                    estado.resultado?.let { TarjetaResultado(it) }
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        estado.resultado?.let { TarjetaResultado(it) }
+                        BotonPrincipal(
+                            texto = "Guardar registro",
+                            onClick = { viewModel.guardar(usuarioId, onGuardado) },
+                            cargando = estado.guardando
+                        )
+                    }
                 }
             }
         }
