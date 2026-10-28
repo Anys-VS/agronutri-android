@@ -7,9 +7,7 @@ data class CalculoNutricionalUiState(
     val lote: String = "",
     val metaRendimiento: String = "",
     val eficienciaRiego: String = "",
-    // Dirección content:// de la foto foliar. Vacía = sin foto (es opcional).
     val fotoUri: String = "",
-    // null = todavía no se calcula, o se cambió un dato después de calcular.
     val resultado: Nutrientes? = null,
     val calculando: Boolean = false,
     val guardando: Boolean = false,

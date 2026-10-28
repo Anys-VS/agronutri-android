@@ -1,8 +1,8 @@
 package cl.duoc.agronutri.domain
 
 // Regla de tres según rendimiento base, corregida por la eficiencia de riego:
-//   demanda = requerimientoBase x (meta / rendimientoBase) / (eficiencia / 100)
-// TODO confirmar la fórmula con el cliente: NutriExpert no la muestra.
+
+// TODO confirmar la fórmula con el cliente.
 object CalculoNutricional {
 
     fun calcular(
