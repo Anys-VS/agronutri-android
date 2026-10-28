@@ -126,7 +126,10 @@ private fun Saludo(state: HomeUiState, onCerrarSesion: (() -> Unit)?) {
         )
         Spacer(Modifier.height(12.dp))
         // La app trabaja offline: todo se guarda en el teléfono y se sincroniza en una etapa futura.
-        ChipSinConexion(texto = "Sin conexión · ${textoPendientes(state.pendientes)}")
+        ChipSinConexion(
+            texto = "${if (state.conectado) "Con conexión" else "Sin conexión"} · ${textoPendientes(state.pendientes)}",
+            conectado = state.conectado
+        )
         Spacer(Modifier.height(8.dp))
     }
 }

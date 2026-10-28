@@ -20,6 +20,7 @@ import cl.duoc.agronutri.ui.CalculoNutricionalScreen
 import cl.duoc.agronutri.ui.HistorialScreen
 import cl.duoc.agronutri.ui.HomeScreen
 import cl.duoc.agronutri.ui.formatoFecha
+import cl.duoc.agronutri.ui.recordarConexion
 import cl.duoc.agronutri.ui.LoginScreen
 import cl.duoc.agronutri.ui.RegistroScreen
 import cl.duoc.agronutri.ui.SplashScreen
@@ -94,8 +95,10 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(Screen.Home.route) {
+                        val conectado = recordarConexion()
                         HomeScreen(
                             state = HomeUiState(
+                                conectado = conectado,
                                 nombre = sesion?.nombre.orEmpty(),
                                 rol = sesion?.rol.orEmpty(),
                                 pendientes = registros.count { !it.sincronizado },

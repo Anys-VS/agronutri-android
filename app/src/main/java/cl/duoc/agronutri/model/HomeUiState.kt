@@ -4,6 +4,7 @@ data class HomeUiState(
     val nombre: String = "",
     val rol: String = "",
     val pendientes: Int = 0,
+    val conectado: Boolean = false,
     val ultimosRegistros: List<RegistroResumen> = emptyList()
 )
 

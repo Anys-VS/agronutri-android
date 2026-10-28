@@ -1,6 +1,7 @@
 package cl.duoc.agronutri.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -66,6 +67,8 @@ object ColoresMarca {
     val ChipFondo = Color(0xFFF5F5F0)
     val ChipBorde = Color(0xFF626960)
     val TextoLogo = Color(0xFF153E45) // color del nombre en el SVG del logo
+    val AmbarFondo = Color(0xFFFFF4E0) // chip "Sin conexión": aviso tranquilo, no error
+    val Ambar = Color(0xFF8A5A00)
 }
 
 @Composable
@@ -173,7 +176,7 @@ fun IlustracionBienvenida(modifier: Modifier = Modifier, balanceo: Float = 0f) {
 
 /** Ícono de wifi tachado. */
 @Composable
-private fun IconoSinConexion(modifier: Modifier = Modifier, color: Color) {
+private fun IconoSinConexion(modifier: Modifier = Modifier, color: Color, tachado: Boolean = true) {
     Canvas(modifier) {
         val w = size.width
         val h = size.height
@@ -192,29 +195,54 @@ private fun IconoSinConexion(modifier: Modifier = Modifier, color: Color) {
             )
         }
         drawCircle(color, radius = g, center = centro)
-        drawLine(color, Offset(w * 0.12f, h * 0.08f), Offset(w * 0.88f, h * 0.92f), strokeWidth = g, cap = StrokeCap.Round)
+        if (tachado) {
+            drawLine(color, Offset(w * 0.12f, h * 0.08f), Offset(w * 0.88f, h * 0.92f), strokeWidth = g, cap = StrokeCap.Round)
+        }
     }
 }
 
 @Composable
-fun ChipSinConexion(modifier: Modifier = Modifier, texto: String = "Funciona sin conexión") {
+fun ChipSinConexion(
+    modifier: Modifier = Modifier,
+    texto: String = "Funciona sin conexión",
+    conectado: Boolean? = null  // null = chip neutro (bienvenida), true = verde, false = ámbar
+) {
+    // El color pasa suave de ámbar a verde al volver la señal, como el botón de la guía de animaciones.
+    val colorFondo by animateColorAsState(
+        targetValue = when (conectado) {
+            true -> ColoresMarca.HojaRelleno
+            false -> ColoresMarca.AmbarFondo
+            null -> ColoresMarca.ChipFondo
+        },
+        label = "fondoChip"
+    )
+    val colorContenido by animateColorAsState(
+        targetValue = when (conectado) {
+            true -> ColoresMarca.Verde
+            false -> ColoresMarca.Ambar
+            null -> ColoresMarca.Titulo
+        },
+        label = "contenidoChip"
+    )
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50),
-        color = ColoresMarca.ChipFondo,
-        border = BorderStroke(1.dp, ColoresMarca.ChipBorde)
+        color = colorFondo,
+        border = BorderStroke(1.dp, if (conectado == null) ColoresMarca.ChipBorde else colorContenido)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconoSinConexion(Modifier.size(18.dp), color = ColoresMarca.Titulo)
+            // Con conexión el ícono de wifi va sin la línea que lo tacha.
+            IconoSinConexion(Modifier.size(18.dp), color = colorContenido, tachado = conectado != true)
             Spacer(Modifier.width(8.dp))
             Text(
                 texto,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = ColoresMarca.Titulo
+                color = colorContenido
             )
         }
     }
