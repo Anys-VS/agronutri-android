@@ -68,7 +68,6 @@ object ColoresMarca {
     val TextoLogo = Color(0xFF153E45) // color del nombre en el SVG del logo
 }
 
-/** Franja verde superior con el nombre de la marca (res/values/marca.xml). */
 @Composable
 fun EncabezadoMarca(modifier: Modifier = Modifier, onVolver: (() -> Unit)? = null) {
     Box(
@@ -93,7 +92,6 @@ fun EncabezadoMarca(modifier: Modifier = Modifier, onVolver: (() -> Unit)? = nul
     }
 }
 
-/** Logo de NutriExpert (res/drawable/logo.xml), como LogoApp de la guía de pantalla de inicio. */
 @Composable
 fun LogoApp(modifier: Modifier = Modifier) {
     Image(
@@ -117,13 +115,13 @@ private fun DrawScope.dibujarHoja(w: Float, h: Float, trazo: Color, relleno: Col
     drawLine(trazo, Offset(w * 0.5f, h * 0.62f), Offset(w * 0.8f, h * 0.42f), strokeWidth = g, cap = StrokeCap.Round)
 }
 
-/** Ilustración de la bienvenida: sol, hoja, gota y suelo. [balanceo] mueve la hoja en grados. */
+/** imagen central sol, hoja, gota y suelo. efecto de balanceo que mueve la hoja en grados. */
 @Composable
 fun IlustracionBienvenida(modifier: Modifier = Modifier, balanceo: Float = 0f) {
     Canvas(modifier) {
         val W = size.width
         val H = size.height
-        val base = minOf(W, H * 1.3f)       // escala para que no se deforme en pantallas anchas
+        val base = minOf(W, H * 1.3f)       // escala para que no se deforme en pantallas anchas, responsivo
         val cx = W / 2f
         val g = 3.dp.toPx()
 
@@ -161,7 +159,6 @@ fun IlustracionBienvenida(modifier: Modifier = Modifier, balanceo: Float = 0f) {
         }
         drawPath(gota, Color.White)
         drawPath(gota, ColoresMarca.Gota, style = Stroke(width = g, join = StrokeJoin.Round))
-        // Brillo interior de la gota
         drawArc(
             color = ColoresMarca.Gota,
             startAngle = 100f,
@@ -223,7 +220,7 @@ fun ChipSinConexion(modifier: Modifier = Modifier, texto: String = "Funciona sin
     }
 }
 
-/** Botón verde relleno. Mientras [cargando] es true muestra un indicador animado. */
+/** Botón verde relleno. Mientras cargando es true muestra un indicador animado. */
 @Composable
 fun BotonPrincipal(
     texto: String,

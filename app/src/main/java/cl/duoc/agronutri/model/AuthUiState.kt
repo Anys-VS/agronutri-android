@@ -31,7 +31,6 @@ data class RegistroUiState(
     val cargando: Boolean = false
 )
 
-// Datos de la sesión abierta. No incluye el hash ni la sal.
 data class SesionUsuario(
     val id: Long,
     val nombre: String,
