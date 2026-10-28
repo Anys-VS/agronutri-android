@@ -108,5 +108,3 @@ Pruebas unitarias del cálculo:
 - Carolina Flores Flores
 - Dennis Alan Fraser Milling
 - Ana María Vidal Salva
-
-Cliente: Consultora Gestión y Proyectos Ltda.
