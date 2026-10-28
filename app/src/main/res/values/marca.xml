@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Nombre de la marca que se muestra en las pantallas.
+         Para cambiarlo en toda la app, edita solo esta línea. -->
+    <string name="nombre_marca">NutriExpert</string>
+</resources>

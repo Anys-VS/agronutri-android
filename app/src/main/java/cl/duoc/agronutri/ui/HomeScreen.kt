@@ -4,28 +4,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cl.duoc.agronutri.model.HomeUiState
 import cl.duoc.agronutri.model.RegistroResumen
 import cl.duoc.agronutri.ui.theme.AgroNutriTheme
@@ -39,102 +39,95 @@ fun HomeScreen(
     onVerHistorial: (() -> Unit)? = null,
     onCerrarSesion: (() -> Unit)? = null
 ) {
-    Scaffold { padding ->
-        LazyColumn(
+    Scaffold(
+        containerColor = Color.White,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { padding ->
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(padding)
         ) {
-            item {
-                Encabezado(state = state, onCerrarSesion = onCerrarSesion)
-            }
-            item {
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(onClick = onNuevoRegistro, modifier = Modifier.fillMaxWidth()) {
-                        Text("Nuevo registro de terreno")
-                    }
-                    if (onVerHistorial != null) {
-                        OutlinedButton(onClick = onVerHistorial, modifier = Modifier.fillMaxWidth()) {
-                            Text("Ver historial")
+            EncabezadoMarca()
+
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .navigationBarsPadding(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Saludo(state = state, onCerrarSesion = onCerrarSesion)
+                }
+                item {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        BotonPrincipal("Nuevo registro de terreno", onClick = onNuevoRegistro)
+                        if (onVerHistorial != null) {
+                            BotonSecundario("Ver historial", onClick = onVerHistorial)
                         }
                     }
                 }
-            }
-            item {
-                Text(
-                    text = "Últimos registros",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                )
-            }
-            if (state.ultimosRegistros.isEmpty()) {
                 item {
                     Text(
-                        text = "Aún no hay registros. Crea el primero desde terreno, funciona sin conexión.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        text = "Últimos registros",
+                        color = ColoresMarca.Titulo,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
                     )
                 }
-            } else {
-                items(state.ultimosRegistros, key = { it.id }) { registro ->
-                    TarjetaRegistro(
-                        registro = registro,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+                if (state.ultimosRegistros.isEmpty()) {
+                    item {
+                        Text(
+                            text = "Aún no hay registros. Crea el primero desde terreno, funciona sin conexión.",
+                            color = ColoresMarca.Subtitulo,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 24.dp)
+                        )
+                    }
+                } else {
+                    items(state.ultimosRegistros, key = { it.id }) { registro ->
+                        TarjetaRegistro(
+                            registro = registro,
+                            modifier = Modifier.padding(horizontal = 24.dp)
+                        )
+                    }
                 }
+                item { Spacer(Modifier.height(24.dp)) }
             }
-            item { Spacer(Modifier.height(16.dp)) }
         }
     }
 }
 
 @Composable
-private fun Encabezado(state: HomeUiState, onCerrarSesion: (() -> Unit)?) {
-    Surface(color = MaterialTheme.colorScheme.primary) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "AgroNutri",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
-                )
-                if (onCerrarSesion != null) {
-                    TextButton(onClick = onCerrarSesion) {
-                        Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
-                    }
-                }
-            }
-            Spacer(Modifier.height(8.dp))
+private fun Saludo(state: HomeUiState, onCerrarSesion: (() -> Unit)?) {
+    Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "Hola, ${state.nombre}",
-                style = MaterialTheme.typography.headlineSmall
+                color = ColoresMarca.Titulo,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.weight(1f)
             )
-            Text(
-                text = nombreRol(state.rol),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(Modifier.height(12.dp))
-            // La app trabaja offline: todo se guarda en el teléfono y se sincroniza en una etapa futura.
-            AssistChip(
-                onClick = {},
-                label = {
-                    Text(
-                        text = "Sin conexión · ${textoPendientes(state.pendientes)}",
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+            if (onCerrarSesion != null) {
+                TextButton(onClick = onCerrarSesion) {
+                    Text("Cerrar sesión", color = ColoresMarca.Verde, fontWeight = FontWeight.SemiBold)
                 }
-            )
+            }
         }
+        Text(
+            text = nombreRol(state.rol),
+            color = ColoresMarca.Subtitulo,
+            fontSize = 15.sp
+        )
+        Spacer(Modifier.height(12.dp))
+        // La app trabaja offline: todo se guarda en el teléfono y se sincroniza en una etapa futura.
+        ChipSinConexion(texto = "Sin conexión · ${textoPendientes(state.pendientes)}")
+        Spacer(Modifier.height(8.dp))
     }
 }
 
@@ -142,21 +135,26 @@ private fun Encabezado(state: HomeUiState, onCerrarSesion: (() -> Unit)?) {
 private fun TarjetaRegistro(registro: RegistroResumen, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = ColoresMarca.ChipFondo)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(registro.cultivo, style = MaterialTheme.typography.titleSmall)
-                Text("Lote ${registro.lote} · ${registro.fecha}", style = MaterialTheme.typography.bodySmall)
+                Text(registro.cultivo, color = ColoresMarca.Titulo, fontWeight = FontWeight.Bold)
+                Text(
+                    "Lote ${registro.lote} · ${registro.fecha}",
+                    color = ColoresMarca.Subtitulo,
+                    fontSize = 13.sp
+                )
             }
             Text(
                 text = if (registro.sincronizado) "Sincronizado" else "Pendiente",
-                style = MaterialTheme.typography.labelMedium,
-                color = if (registro.sincronizado) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.tertiary
+                color = if (registro.sincronizado) ColoresMarca.Verde else ColoresMarca.Gota,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }

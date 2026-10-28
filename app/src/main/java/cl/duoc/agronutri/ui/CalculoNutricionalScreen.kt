@@ -11,27 +11,33 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -61,10 +67,10 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculoNutricionalScreen(
-    viewModel: CalculoNutricionalViewModel = viewModel()
+    viewModel: CalculoNutricionalViewModel = viewModel(),
+    onVolver: (() -> Unit)? = null
 ) {
     val estado by viewModel.estado.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -143,130 +149,154 @@ fun CalculoNutricionalScreen(
         targetValue = when {
             estado.calculando -> Color.Gray
             estado.resultado != null -> Color(0xFF2E7D32)
-            else -> MaterialTheme.colorScheme.primary
+            else -> ColoresMarca.Verde
         },
         label = "colorBoton"
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .verticalScroll(scrollState)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            "Cálculo nutricional",
-            style = MaterialTheme.typography.headlineSmall
-        )
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = Color.White,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .imePadding()
+        ) {
+            EncabezadoMarca(onVolver = onVolver)
 
-        Text("Cultivo")
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            cultivos.forEach { cultivo ->
-                FilterChip(
-                    selected = estado.cultivo == cultivo,
-                    onClick = { viewModel.onCultivoChange(cultivo) },
-                    label = { Text(cultivo) }
-                )
-            }
-        }
-        estado.errores.cultivo?.let { mensaje ->
-            Text(mensaje, color = MaterialTheme.colorScheme.error)
-        }
-
-        OutlinedTextField(
-            value = estado.lote,
-            onValueChange = viewModel::onLoteChange,
-            label = { Text("Lote / Cuartel") },
-            isError = estado.errores.lote != null,
-            supportingText = {
-                estado.errores.lote?.let { mensaje ->
-                    Text(mensaje)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+                    .navigationBarsPadding()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column {
+                    Text(
+                        "Registro de terreno",
+                        color = ColoresMarca.Titulo,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Datos del lote y cálculo nutricional",
+                        color = ColoresMarca.Subtitulo,
+                        fontSize = 15.sp
+                    )
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
 
-        OutlinedTextField(
-            value = estado.metaRendimiento,
-            onValueChange = viewModel::onMetaRendimientoChange,
-            label = { Text("Meta de rendimiento (t/há)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            isError = estado.errores.metaRendimiento != null,
-            supportingText = {
-                estado.errores.metaRendimiento?.let { mensaje ->
-                    Text(mensaje)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = estado.eficienciaRiego,
-            onValueChange = viewModel::onEficienciaRiegoChange,
-            label = { Text("Eficiencia de riego (%)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            isError = estado.errores.eficienciaRiego != null,
-            supportingText = {
-                estado.errores.eficienciaRiego?.let { mensaje ->
-                    Text(mensaje)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Text("Foto foliar (opcional)")
-        if (foto != null) {
-            Image(
-                bitmap = foto,
-                contentDescription = "Foto foliar del lote",
-                modifier = Modifier.size(160.dp),
-                contentScale = ContentScale.Crop
-            )
-        }
-        OutlinedButton(onClick = { pedirFoto() }, modifier = Modifier.fillMaxWidth()) {
-            Text(if (estado.fotoUri.isBlank()) "Tomar foto foliar" else "Tomar otra foto")
-        }
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        Text("Vista previa en tiempo real")
-        Text("Cultivo: ${estado.cultivo}")
-        Text("Lote: ${estado.lote}")
-        Text("Meta de rendimiento: ${estado.metaRendimiento} t/há")
-        Text("Eficiencia de riego: ${estado.eficienciaRiego} %")
-        Text("Foto foliar: ${if (estado.fotoUri.isBlank()) "sin foto" else "adjunta"}")
-
-        Button(
-            onClick = {
-                if (viewModel.validar()) {
-                    viewModel.calcular()
-                } else {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Errores detectados. Revisa los campos.")
+                Text("Cultivo", color = ColoresMarca.Subtitulo, fontWeight = FontWeight.SemiBold)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    cultivos.forEach { cultivo ->
+                        FilterChip(
+                            selected = estado.cultivo == cultivo,
+                            onClick = { viewModel.onCultivoChange(cultivo) },
+                            label = { Text(cultivo) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = ColoresMarca.Verde,
+                                selectedLabelColor = Color.White
+                            )
+                        )
                     }
                 }
-            },
-            enabled = !estado.calculando,
-            colors = ButtonDefaults.buttonColors(containerColor = colorBoton),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            if (estado.calculando) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = Color.White,
-                    strokeWidth = 2.dp
+                estado.errores.cultivo?.let { mensaje ->
+                    Text(mensaje, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                }
+
+                CampoTexto(
+                    valor = estado.lote,
+                    onCambio = viewModel::onLoteChange,
+                    etiqueta = "Lote / Cuartel",
+                    error = estado.errores.lote
                 )
-            } else {
-                Text(if (estado.resultado != null) "Recalcular" else "Calcular")
+                CampoTexto(
+                    valor = estado.metaRendimiento,
+                    onCambio = viewModel::onMetaRendimientoChange,
+                    etiqueta = "Meta de rendimiento (t/há)",
+                    error = estado.errores.metaRendimiento,
+                    tipoTeclado = KeyboardType.Decimal
+                )
+                CampoTexto(
+                    valor = estado.eficienciaRiego,
+                    onCambio = viewModel::onEficienciaRiegoChange,
+                    etiqueta = "Eficiencia de riego (%)",
+                    error = estado.errores.eficienciaRiego,
+                    tipoTeclado = KeyboardType.Decimal,
+                    accionTeclado = ImeAction.Done
+                )
+
+                Text("Foto foliar (opcional)", color = ColoresMarca.Subtitulo, fontWeight = FontWeight.SemiBold)
+                if (foto != null) {
+                    Image(
+                        bitmap = foto,
+                        contentDescription = "Foto foliar del lote",
+                        modifier = Modifier
+                            .size(160.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                BotonSecundario(
+                    texto = if (estado.fotoUri.isBlank()) "Tomar foto foliar" else "Tomar otra foto",
+                    onClick = { pedirFoto() }
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                Text("Vista previa en tiempo real", color = ColoresMarca.Titulo, fontWeight = FontWeight.Bold)
+                Column {
+                    Text("Cultivo: ${estado.cultivo}", color = ColoresMarca.Subtitulo)
+                    Text("Lote: ${estado.lote}", color = ColoresMarca.Subtitulo)
+                    Text("Meta de rendimiento: ${estado.metaRendimiento} t/há", color = ColoresMarca.Subtitulo)
+                    Text("Eficiencia de riego: ${estado.eficienciaRiego} %", color = ColoresMarca.Subtitulo)
+                    Text(
+                        "Foto foliar: ${if (estado.fotoUri.isBlank()) "sin foto" else "adjunta"}",
+                        color = ColoresMarca.Subtitulo
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        if (viewModel.validar()) {
+                            viewModel.calcular()
+                        } else {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Errores detectados. Revisa los campos.")
+                            }
+                        }
+                    },
+                    enabled = !estado.calculando,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorBoton),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                ) {
+                    if (estado.calculando) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            if (estado.resultado != null) "Recalcular" else "Calcular",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+
+                AnimatedVisibility(visible = estado.resultado != null) {
+                    estado.resultado?.let { TarjetaResultado(it) }
+                }
             }
         }
-
-        AnimatedVisibility(visible = estado.resultado != null) {
-            estado.resultado?.let { TarjetaResultado(it) }
-        }
-
-        SnackbarHost(hostState = snackbarHostState)
     }
 }
 
@@ -274,23 +304,29 @@ fun CalculoNutricionalScreen(
 private fun TarjetaResultado(resultado: Nutrientes) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = ColoresMarca.ChipFondo)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text("Demanda estimada (kg/há)", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Demanda estimada (kg/há)",
+                color = ColoresMarca.Titulo,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
             resultado.comoLista().forEach { (nombre, valor) ->
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(nombre, modifier = Modifier.weight(1f))
-                    Text(formatoKg(valor), fontWeight = FontWeight.Bold)
+                    Text(nombre, color = ColoresMarca.Subtitulo, modifier = Modifier.weight(1f))
+                    Text(formatoKg(valor), color = ColoresMarca.Verde, fontWeight = FontWeight.Bold)
                 }
             }
             Text(
                 "Estimación referencial, datos de ejemplo. No usar como recomendación.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = ColoresMarca.Subtitulo,
+                fontSize = 12.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
